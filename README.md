@@ -1,6 +1,7 @@
 # Ignorant
 
-**TODO: Add description**
+Because sometimes ignorance is bliss.
+
 
 ## Installation
 
