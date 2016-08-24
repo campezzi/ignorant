@@ -9,6 +9,11 @@ defimpl Ignorant, for: Map do
     |> Enum.reduce([], &do_extract_ignored/2)
   end
 
+  def merge_ignored(destination, %{} = source) do
+    fields_to_ignore = source |> extract_ignored
+    destination |> ignore(fields_to_ignore)
+  end
+
   defp do_ignore({key, ignored_fields}, source_map) do
     {k, v} = fetch(source_map, key)
 

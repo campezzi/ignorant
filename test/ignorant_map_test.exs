@@ -86,4 +86,45 @@ defmodule IgnorantMapTest do
       assert Ignorant.extract_ignored(map) == expected
     end
   end
+
+  describe "merge_ignored/2" do
+    test "applies :ignored tags from the source map to the destination map" do
+      dst = %{name: "Jim", age: 25}
+      src = %{name: "Other", age: :ignored}
+
+      expected = %{name: "Jim", age: :ignored}
+
+      assert Ignorant.merge_ignored(dst, src) == expected
+    end
+
+    test "works with nested structures" do
+      nested_map = %{email: "a@a.com", phone: "123456"}
+      nested_list = [%{title: "a", details: "a"}, %{title: "b", details: "b"}]
+      dst = %{name: "Jim", age: 25, contacts: nested_map, posts: nested_list}
+      ignored_nested_map = %{email: "b@b.com", phone: :ignored}
+      ignored_nested_list = [%{title: "x", details: :ignored}, %{title: "y", details: :ignored}]
+      src = %{name: "Other", age: :ignored, contacts: ignored_nested_map, posts: ignored_nested_list}
+
+      expected_nested_map = %{email: "a@a.com", phone: :ignored}
+      expected_nested_list = [%{title: "a", details: :ignored}, %{title: "b", details: :ignored}]
+      expected = %{name: "Jim", age: :ignored, contacts: expected_nested_map, posts: expected_nested_list}
+
+      assert Ignorant.merge_ignored(dst, src) == expected
+    end
+
+    test "works with maps with strings as keys" do
+      nested_map = %{"email" => "a@a.com", "phone" => "123456"}
+      nested_list = [%{"title" => "a", "details" => "a"}, %{"title" => "b", "details" => "b"}]
+      dst = %{"name" => "Jim", "age" => 25, "contacts" => nested_map, "posts" => nested_list}
+      ignored_nested_map = %{"email" => "b@b.com", "phone" => :ignored}
+      ignored_nested_list = [%{"title" => "x", "details" => :ignored}, %{"title" => "y", "details" => :ignored}]
+      src = %{"name" => "Other", "age" => :ignored, "contacts" => ignored_nested_map, "posts" => ignored_nested_list}
+
+      expected_nested_map = %{"email" => "a@a.com", "phone" => :ignored}
+      expected_nested_list = [%{"title" => "a", "details" => :ignored}, %{"title" => "b", "details" => :ignored}]
+      expected = %{"name" => "Jim", "age" => :ignored, "contacts" => expected_nested_map, "posts" => expected_nested_list}
+
+      assert Ignorant.merge_ignored(dst, src) == expected
+    end
+  end
 end
