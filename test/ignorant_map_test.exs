@@ -50,4 +50,40 @@ defmodule IgnorantMapTest do
       assert Ignorant.ignore(map, ["age", "contacts": ["phone"], "posts": ["details"]]) == expected
     end
   end
+
+  describe "ignored_fields/1" do
+    test "returns a list of fields that are tagged :ignored" do
+      map = %{name: "Jim", age: :ignored}
+
+      assert Ignorant.extract_ignored_fields(map) == [:age]
+    end
+
+    test "works for nested maps" do
+      nested_map = %{email: "a@a.com", phone: :ignored}
+      map = %{name: "Jim", age: :ignored, contacts: nested_map}
+
+      expected = [{:contacts, [:phone]}, :age]
+
+      assert Ignorant.extract_ignored_fields(map) == expected
+    end
+
+    test "works for nested lists" do
+      nested_list = [%{title: "a", details: :ignored}, %{title: "b", details: :ignored}]
+      map = %{name: "Jim", age: :ignored, posts: nested_list}
+
+      expected = [{:posts, [:details]}, :age]
+
+      assert Ignorant.extract_ignored_fields(map) == expected
+    end
+
+    test "works for maps with strings for keys" do
+      nested_map = %{"email" => "a@a.com", "phone" => :ignored}
+      nested_list = [%{"title" => "a", "details" => :ignored}, %{"title" => "b", "details" => :ignored}]
+      map = %{"name" => "Jim", "age" => :ignored, "contacts" => nested_map, "posts" => nested_list}
+
+      expected = [{:"posts", ["details"]}, {:"contacts", ["phone"]}, "age"]
+
+      assert Ignorant.extract_ignored_fields(map) == expected
+    end
+  end
 end
