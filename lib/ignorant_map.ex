@@ -4,9 +4,9 @@ defimpl Ignorant, for: Map do
     |> Enum.reduce(map, &do_ignore/2)
   end
 
-  def extract_ignored_fields(map) do
+  def extract_ignored(map) do
     map
-    |> Enum.reduce([], &do_extract_ignored_fields/2)
+    |> Enum.reduce([], &do_extract_ignored/2)
   end
 
   defp do_ignore({key, ignored_fields}, source_map) do
@@ -24,15 +24,15 @@ defimpl Ignorant, for: Map do
     %{source_map | ignored_field => :ignored}
   end
 
-  defp do_extract_ignored_fields({key, :ignored}, ignored_fields), do: [key | ignored_fields]
-  defp do_extract_ignored_fields({key, [value | _]}, ignored_fields) do
-    do_extract_ignored_fields({key, value}, ignored_fields)
+  defp do_extract_ignored({key, :ignored}, ignored_fields), do: [key | ignored_fields]
+  defp do_extract_ignored({key, [value | _]}, ignored_fields) do
+    do_extract_ignored({key, value}, ignored_fields)
   end
-  defp do_extract_ignored_fields({key, map}, ignored_fields) when is_map(map) do
-    child_node_fields = extract_ignored_fields(map)
+  defp do_extract_ignored({key, map}, ignored_fields) when is_map(map) do
+    child_node_fields = extract_ignored(map)
     [{:"#{key}", child_node_fields} | ignored_fields]
   end
-  defp do_extract_ignored_fields(_, ignored_fields), do: ignored_fields
+  defp do_extract_ignored(_, ignored_fields), do: ignored_fields
 
   defp fetch(map, key) do
     case map[key] do
