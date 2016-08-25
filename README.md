@@ -52,7 +52,7 @@ expected = %{id: :ignored, name: "Jim"}
 assert expected == Ignorant.merge_ignored(response, expected)
 ```
 
-`merge_ignored` will walk through the `expected` map extracting all fields tagged as `:ignored`, and
+`merge_ignored/2` will walk through the `expected` map extracting all fields tagged as `:ignored`, and
 then apply those to `response` while keeping all other values intact. The resulting map should be
 equal to `expected`. If not, you'll get a pretty diff explaining what's different.
 
